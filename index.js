@@ -14,17 +14,19 @@ var SimpleToast = {
 
   show: function (
     message,
-    duration
+    duration,
+    color
   ) {
-    RCTToastAndroid.show(message, duration === undefined ? this.SHORT : duration);
+    RCTToastAndroid.show(message, duration === undefined ? this.SHORT : duration,color);
   },
 
   showWithGravity: function (
     message,
     duration,
     gravity,
+    color
   ) {
-    RCTToastAndroid.showWithGravity(message, duration === undefined ? this.SHORT : duration, gravity);
+    RCTToastAndroid.showWithGravity(message, duration === undefined ? this.SHORT : duration, gravity,color);
   },
 };
 
