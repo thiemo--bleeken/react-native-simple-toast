@@ -62,12 +62,13 @@ extern const NSString * CSToastPositionBottom;
  */
 - (void)makeToast:(NSString *)message
          duration:(NSTimeInterval)duration
-         position:(id)position;
+         position:(id)position
+         color:(NSString *)color;
 
 /**
  Creates and presents a new toast view with a message. Duration, position, and
  style can be set explicitly.
- 
+
  @param message The message to be displayed
  @param duration The toast duration
  @param position The toast's center point. Can be one of the predefined CSToastPosition
@@ -77,14 +78,15 @@ extern const NSString * CSToastPositionBottom;
 - (void)makeToast:(NSString *)message
          duration:(NSTimeInterval)duration
          position:(id)position
+         color:(NSString *)color
             style:(CSToastStyle *)style;
 
 /**
  Creates and presents a new toast view with a message, title, and image. Duration,
  position, and style can be set explicitly. The completion block executes when the
- toast view completes. `didTap` will be `YES` if the toast view was dismissed from 
+ toast view completes. `didTap` will be `YES` if the toast view was dismissed from
  a tap.
- 
+
  @param message The message to be displayed
  @param duration The toast duration
  @param position The toast's center point. Can be one of the predefined CSToastPosition
@@ -98,6 +100,7 @@ extern const NSString * CSToastPositionBottom;
 - (void)makeToast:(NSString *)message
          duration:(NSTimeInterval)duration
          position:(id)position
+         color:(NSString *)color
             title:(NSString *)title
             image:(UIImage *)image
             style:(CSToastStyle *)style
@@ -108,9 +111,9 @@ extern const NSString * CSToastPositionBottom;
  The look and feel is configured via the style. Unlike the `makeToast:` methods,
  this method does not present the toast view automatically. One of the showToast:
  methods must be used to present the resulting view.
- 
+
  @warning if message, title, and image are all nil, this method will return nil.
- 
+
  @param message The message to be displayed
  @param title The title
  @param image The image
@@ -118,20 +121,21 @@ extern const NSString * CSToastPositionBottom;
  @return The newly created toast view
  */
 - (UIView *)toastViewForMessage:(NSString *)message
+                          color:(NSString *)color
                           title:(NSString *)title
                           image:(UIImage *)image
                           style:(CSToastStyle *)style;
 
 /**
  Creates and displays a new toast activity indicator view at a specified position.
- 
+
  @warning Only one toast activity indicator view can be presented per superview. Subsequent
  calls to `makeToastActivity:` will be ignored until hideToastActivity is called.
- 
+
  @warning `makeToastActivity:` works independently of the showToast: methods. Toast activity
  views can be presented and dismissed while toast views are being displayed. `makeToastActivity:`
  has no effect on the queueing behavior of the showToast: methods.
- 
+
  @param position The toast's center point. Can be one of the predefined CSToastPosition
                  constants or a `CGPoint` wrapped in an `NSValue` object.
  */
@@ -144,16 +148,16 @@ extern const NSString * CSToastPositionBottom;
 
 /**
  Displays any view as toast using the default duration and position.
- 
+
  @param toast The view to be displayed as toast
  */
 - (void)showToast:(UIView *)toast;
 
 /**
- Displays any view as toast at a provided position and duration. The completion block 
- executes when the toast view completes. `didTap` will be `YES` if the toast view was 
+ Displays any view as toast at a provided position and duration. The completion block
+ executes when the toast view completes. `didTap` will be `YES` if the toast view was
  dismissed from a tap.
- 
+
  @param toast The view to be displayed as toast
  @param duration The notification duration
  @param position The toast's center point. Can be one of the predefined CSToastPosition
@@ -164,6 +168,7 @@ extern const NSString * CSToastPositionBottom;
 - (void)showToast:(UIView *)toast
          duration:(NSTimeInterval)duration
          position:(id)position
+         color:(NSString *)color
        completion:(void(^)(BOOL didTap))completion;
 
 @end
