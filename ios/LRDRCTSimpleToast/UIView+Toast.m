@@ -45,9 +45,9 @@ static const NSString * CSToastQueueKey             = @"CSToastQueueKey";
 @interface UIView (ToastPrivate)
 
 /**
- These private methods are being prefixed with "cs_" to reduce the likelihood of non-obvious 
+ These private methods are being prefixed with "cs_" to reduce the likelihood of non-obvious
  naming conflicts with other UIView methods.
- 
+
  @discussion Should the public API also use the cs_ prefix? Technically it should, but it
  results in code that is less legible. The current public method names seem unlikely to cause
  conflicts so I think we should favor the cleaner API for now.
@@ -67,30 +67,30 @@ static const NSString * CSToastQueueKey             = @"CSToastQueueKey";
 #pragma mark - Make Toast Methods
 
 - (void)makeToast:(NSString *)message {
-    [self makeToast:message duration:[CSToastManager defaultDuration] position:[CSToastManager defaultPosition] color:nil style:nil];
+    [self makeToast:message duration:[CSToastManager defaultDuration] position:[CSToastManager defaultPosition] customStyle:nil style:nil];
 }
 
-- (void)makeToast:(NSString *)message duration:(NSTimeInterval)duration position:(id)position color:(NSString *)color {
-    [self makeToast:message duration:duration position:position color:color style:nil];
+- (void)makeToast:(NSString *)message duration:(NSTimeInterval)duration position:(id)position customStyle:(NSDictionary *)customStyle {
+    [self makeToast:message duration:duration position:position customStyle:customStyle style:nil];
 }
 
-- (void)makeToast:(NSString *)message duration:(NSTimeInterval)duration position:(id)position color:(NSString *)color style:(CSToastStyle *)style {
-    UIView *toast = [self toastViewForMessage:message color:color title:nil image:nil style:style];
-    [self showToast:toast duration:duration position:position color:color completion:nil];
+- (void)makeToast:(NSString *)message duration:(NSTimeInterval)duration position:(id)position customStyle:(NSDictionary *)customStyle style:(CSToastStyle *)style {
+    UIView *toast = [self toastViewForMessage:message customStyle:customStyle title:nil image:nil style:style];
+    [self showToast:toast duration:duration position:position customStyle:customStyle completion:nil];
 }
 
-- (void)makeToast:(NSString *)message duration:(NSTimeInterval)duration position:(id)position color:(NSString *)color title:(NSString *)title image:(UIImage *)image style:(CSToastStyle *)style completion:(void(^)(BOOL didTap))completion {
-    UIView *toast = [self toastViewForMessage:message color:color title:title image:image style:style];
-    [self showToast:toast duration:duration position:position color:color completion:completion];
+- (void)makeToast:(NSString *)message duration:(NSTimeInterval)duration position:(id)position customStyle:(NSDictionary *)customStyle title:(NSString *)title image:(UIImage *)image style:(CSToastStyle *)style completion:(void(^)(BOOL didTap))completion {
+    UIView *toast = [self toastViewForMessage:message customStyle:customStyle title:title image:image style:style];
+    [self showToast:toast duration:duration position:position customStyle:customStyle completion:completion];
 }
 
 #pragma mark - Show Toast Methods
 
 - (void)showToast:(UIView *)toast {
-    [self showToast:toast duration:[CSToastManager defaultDuration] position:[CSToastManager defaultPosition] color:nil completion:nil];
+    [self showToast:toast duration:[CSToastManager defaultDuration] position:[CSToastManager defaultPosition] customStyle:nil completion:nil];
 }
 
-- (void)showToast:(UIView *)toast duration:(NSTimeInterval)duration position:(id)position color:(NSString *)color completion:(void(^)(BOOL didTap))completion {
+- (void)showToast:(UIView *)toast duration:(NSTimeInterval)duration position:(id)position customStyle:(NSDictionary *)customStyle completion:(void(^)(BOOL didTap))completion {
     // sanity
     if (toast == nil) return;
 
@@ -106,13 +106,13 @@ static const NSString * CSToastQueueKey             = @"CSToastQueueKey";
         [self.cs_toastQueue addObject:toast];
     } else {
         // present
-        [self cs_showToast:toast duration:duration position:position color:color];
+        [self cs_showToast:toast duration:duration position:position customStyle:customStyle];
     }
 }
 
 #pragma mark - Private Show/Hide Methods
 
-- (void)cs_showToast:(UIView *)toast duration:(NSTimeInterval)duration position:(id)position color:(NSString *)color {
+- (void)cs_showToast:(UIView *)toast duration:(NSTimeInterval)duration position:(id)position customStyle:(NSDictionary *)customStyle {
     toast.center = [self cs_centerPointForPosition:position withToast:toast];
     toast.alpha = 0.0;
 
@@ -177,9 +177,9 @@ static const NSString * CSToastQueueKey             = @"CSToastQueueKey";
 
 #pragma mark - View Construction
 
-- (UIView *)toastViewForMessage:(NSString *)message color:(NSString *)color title:(NSString *)title image:(UIImage *)image style:(CSToastStyle *)style {
+- (UIView *)toastViewForMessage:(NSString *)message customStyle:(NSDictionary *)customStyle title:(NSString *)title image:(UIImage *)image style:(CSToastStyle *)style {
     // sanity
-    if(message == nil && title == nil && image == nil && color == nil) return nil;
+    if(message == nil && title == nil && image == nil && customStyle == nil) return nil;
 
     // default to the shared style
     if (style == nil) {
@@ -194,12 +194,12 @@ static const NSString * CSToastQueueKey             = @"CSToastQueueKey";
     UIView *wrapperView = [[UIView alloc] init];
     wrapperView.autoresizingMask = (UIViewAutoresizingFlexibleLeftMargin | UIViewAutoresizingFlexibleRightMargin | UIViewAutoresizingFlexibleTopMargin | UIViewAutoresizingFlexibleBottomMargin);
     wrapperView.layer.cornerRadius = style.cornerRadius;
-    unsigned int c;
-        if ([color characterAtIndex:0] == '#') {
-            [[NSScanner scannerWithString:[color substringFromIndex:1]] scanHexInt:&c];
-        } else {
-            [[NSScanner scannerWithString:color] scanHexInt:&c];
-        }
+        unsigned int c;
+        if ([customStyle[@"backgroundColor"] characterAtIndex:0] == '#') {
+                [[NSScanner scannerWithString:[customStyle[@"backgroundColor"] substringFromIndex:1]] scanHexInt:&c];
+            } else {
+                    [[NSScanner scannerWithString:customStyle[@"backgroundColor"]] scanHexInt:&c];
+                }
 
     if (style.displayShadow) {
         wrapperView.layer.shadowColor = style.shadowColor.CGColor;
@@ -248,12 +248,17 @@ static const NSString * CSToastQueueKey             = @"CSToastQueueKey";
         messageLabel = [[UILabel alloc] init];
         messageLabel.numberOfLines = style.messageNumberOfLines;
         messageLabel.font = style.messageFont;
-        messageLabel.textAlignment = style.messageAlignment;
+        messageLabel.textAlignment =NSTextAlignmentCenter;
         messageLabel.lineBreakMode = NSLineBreakByTruncatingTail;
-        messageLabel.textColor = style.messageColor;
+        messageLabel.textColor =[UIColor whiteColor];
+        messageLabel.layer.borderColor =[UIColor colorWithRed:((c & 0xff0000) >> 16)/255.0
+                                                            green:((c & 0xff00) >> 8)/255.0
+                                                             blue:(c & 0xff)/255.0 alpha:1.0].CGColor;
+        messageLabel.layer.borderWidth=[customStyle[@"borderWidth"] floatValue];
+        messageLabel.layer.cornerRadius=[customStyle[@"borderRadius"] floatValue];
         messageLabel.backgroundColor = [UIColor colorWithRed:((c & 0xff0000) >> 16)/255.0
-                                                                      green:((c & 0xff00) >> 8)/255.0
-                                                                       blue:(c & 0xff)/255.0 alpha:1.0];
+                                                                   green:((c & 0xff00) >> 8)/255.0
+                                                                    blue:(c & 0xff)/255.0 alpha:1.0];
         messageLabel.alpha = 1.0;
         messageLabel.text = message;
 
@@ -278,8 +283,8 @@ static const NSString * CSToastQueueKey             = @"CSToastQueueKey";
     if(messageLabel != nil) {
         messageRect.origin.x = imageRect.origin.x + imageRect.size.width + style.horizontalPadding;
         messageRect.origin.y = titleRect.origin.y + titleRect.size.height + style.verticalPadding;
-        messageRect.size.width = messageLabel.bounds.size.width;
-        messageRect.size.height = messageLabel.bounds.size.height;
+        messageRect.size.width = [customStyle[@"width"] floatValue];
+        messageRect.size.height = [customStyle[@"height"] floatValue];
     }
 
     CGFloat longerWidth = MAX(titleRect.size.width, messageRect.size.width);
@@ -437,7 +442,7 @@ static const NSString * CSToastQueueKey             = @"CSToastQueueKey";
         self.shadowOffset = CGSizeMake(4.0, 4.0);
         self.imageSize = CGSizeMake(80.0, 80.0);
         self.activitySize = CGSizeMake(100.0, 100.0);
-        self.fadeDuration = 0.2;
+        self.fadeDuration = 0.01;
     }
     return self;
 }

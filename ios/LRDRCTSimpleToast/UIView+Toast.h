@@ -63,7 +63,7 @@ extern const NSString * CSToastPositionBottom;
 - (void)makeToast:(NSString *)message
          duration:(NSTimeInterval)duration
          position:(id)position
-         color:(NSString *)color;
+         customStyle:(NSDictionary *)customStyle;
 
 /**
  Creates and presents a new toast view with a message. Duration, position, and
@@ -78,7 +78,7 @@ extern const NSString * CSToastPositionBottom;
 - (void)makeToast:(NSString *)message
          duration:(NSTimeInterval)duration
          position:(id)position
-         color:(NSString *)color
+         customStyle:(NSDictionary *)customStyle
             style:(CSToastStyle *)style;
 
 /**
@@ -100,7 +100,7 @@ extern const NSString * CSToastPositionBottom;
 - (void)makeToast:(NSString *)message
          duration:(NSTimeInterval)duration
          position:(id)position
-         color:(NSString *)color
+         customStyle:(NSDictionary *)customStyle
             title:(NSString *)title
             image:(UIImage *)image
             style:(CSToastStyle *)style
@@ -121,7 +121,7 @@ extern const NSString * CSToastPositionBottom;
  @return The newly created toast view
  */
 - (UIView *)toastViewForMessage:(NSString *)message
-                          color:(NSString *)color
+                          customStyle:(NSDictionary *)customStyle
                           title:(NSString *)title
                           image:(UIImage *)image
                           style:(CSToastStyle *)style;
@@ -168,7 +168,7 @@ extern const NSString * CSToastPositionBottom;
 - (void)showToast:(UIView *)toast
          duration:(NSTimeInterval)duration
          position:(id)position
-         color:(NSString *)color
+         customStyle:(NSDictionary *)customStyle
        completion:(void(^)(BOOL didTap))completion;
 
 @end

@@ -65,12 +65,12 @@ RCT_EXPORT_MODULE()
              };
 }
 
-RCT_EXPORT_METHOD(show:(NSString *)msg duration:(double)duration color:(NSString *)color {
-    [self _show:msg duration:duration color:color gravity:LRDRCTSimpleToastGravityBottom];
+RCT_EXPORT_METHOD(show:(NSString *)msg duration:(double)duration customStyle:(NSDictionary *)customStyle {
+    [self _show:msg duration:duration customStyle:customStyle gravity:LRDRCTSimpleToastGravityBottom];
 });
 
-RCT_EXPORT_METHOD(showWithGravity:(NSString *)msg duration:(double)duration color:(NSString *)color gravity:(nonnull NSNumber *)gravity{
-    [self _show:msg duration:duration color:color gravity:gravity.intValue];
+RCT_EXPORT_METHOD(showWithGravity:(NSString *)msg duration:(double)duration customStyle:(NSDictionary *)customStyle gravity:(nonnull NSNumber *)gravity{
+    [self _show:msg duration:duration customStyle:customStyle gravity:gravity.intValue];
 });
 
 - (UIViewController *)visibleViewController:(UIViewController *)rootViewController
@@ -99,7 +99,7 @@ RCT_EXPORT_METHOD(showWithGravity:(NSString *)msg duration:(double)duration colo
     return [self visibleViewController:presentedViewController];
 }
 
-- (void)_show:(NSString *)msg duration:(NSTimeInterval)duration color:(NSString *)color gravity:(NSInteger)gravity {
+- (void)_show:(NSString *)msg duration:(NSTimeInterval)duration customStyle:(NSDictionary *)customStyle gravity:(NSInteger)gravity {
     dispatch_async(dispatch_get_main_queue(), ^{
         //UIView *root = [[[[[UIApplication sharedApplication] delegate] window] rootViewController] view];
         UIViewController *ctrl = [self visibleViewController:[UIApplication sharedApplication].keyWindow.rootViewController];
@@ -125,7 +125,7 @@ RCT_EXPORT_METHOD(showWithGravity:(NSString *)msg duration:(double)duration colo
         [view makeToast:msg
             duration:duration
             position:position
-            color:color
+            customStyle:customStyle
             title:nil
             image:nil
             style:nil
