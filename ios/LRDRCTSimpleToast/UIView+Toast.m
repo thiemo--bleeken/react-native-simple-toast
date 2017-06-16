@@ -175,6 +175,16 @@ static const NSString * CSToastQueueKey             = @"CSToastQueueKey";
                      }];
 }
 
+- (UIColor *)stringColorConvertoUIColor:(NSString *)color {
+    unsigned int c;
+    if ([color characterAtIndex:0] == '#') {
+        [[NSScanner scannerWithString:[color substringFromIndex:1]] scanHexInt:&c];
+    } else {
+        [[NSScanner scannerWithString:color] scanHexInt:&c];
+    }
+    return [UIColor colorWithRed:((c & 0xff0000) >> 16)/255.0 green:((c & 0xff00) >> 8)/255.0 blue:(c & 0xff)/255.0 alpha:1.0];
+}
+
 #pragma mark - View Construction
 
 - (UIView *)toastViewForMessage:(NSString *)message customStyle:(NSDictionary *)customStyle title:(NSString *)title image:(UIImage *)image style:(CSToastStyle *)style {
@@ -194,12 +204,6 @@ static const NSString * CSToastQueueKey             = @"CSToastQueueKey";
     UIView *wrapperView = [[UIView alloc] init];
     wrapperView.autoresizingMask = (UIViewAutoresizingFlexibleLeftMargin | UIViewAutoresizingFlexibleRightMargin | UIViewAutoresizingFlexibleTopMargin | UIViewAutoresizingFlexibleBottomMargin);
     wrapperView.layer.cornerRadius = style.cornerRadius;
-        unsigned int c;
-        if ([customStyle[@"backgroundColor"] characterAtIndex:0] == '#') {
-                [[NSScanner scannerWithString:[customStyle[@"backgroundColor"] substringFromIndex:1]] scanHexInt:&c];
-            } else {
-                    [[NSScanner scannerWithString:customStyle[@"backgroundColor"]] scanHexInt:&c];
-                }
 
     if (style.displayShadow) {
         wrapperView.layer.shadowColor = style.shadowColor.CGColor;
@@ -243,22 +247,18 @@ static const NSString * CSToastQueueKey             = @"CSToastQueueKey";
         expectedSizeTitle = CGSizeMake(MIN(maxSizeTitle.width, expectedSizeTitle.width), MIN(maxSizeTitle.height, expectedSizeTitle.height));
         titleLabel.frame = CGRectMake(0.0, 0.0, expectedSizeTitle.width, expectedSizeTitle.height);
     }
-
     if (message != nil) {
         messageLabel = [[UILabel alloc] init];
         messageLabel.numberOfLines = style.messageNumberOfLines;
         messageLabel.font = style.messageFont;
         messageLabel.textAlignment =NSTextAlignmentCenter;
         messageLabel.lineBreakMode = NSLineBreakByTruncatingTail;
-        messageLabel.textColor =[UIColor whiteColor];
-        messageLabel.layer.borderColor =[UIColor colorWithRed:((c & 0xff0000) >> 16)/255.0
-                                                            green:((c & 0xff00) >> 8)/255.0
-                                                             blue:(c & 0xff)/255.0 alpha:1.0].CGColor;
+        messageLabel.textColor =[self stringColorConvertoUIColor:customStyle[@"color"]];
+        messageLabel.layer.borderColor = [self stringColorConvertoUIColor:customStyle[@"borderColor"]].CGColor;
         messageLabel.layer.borderWidth=[customStyle[@"borderWidth"] floatValue];
         messageLabel.layer.cornerRadius=[customStyle[@"borderRadius"] floatValue];
-        messageLabel.backgroundColor = [UIColor colorWithRed:((c & 0xff0000) >> 16)/255.0
-                                                                   green:((c & 0xff00) >> 8)/255.0
-                                                                    blue:(c & 0xff)/255.0 alpha:1.0];
+        messageLabel.layer.backgroundColor = [self stringColorConvertoUIColor:customStyle[@"backgroundColor"]].CGColor;
+        messageLabel.backgroundColor = [UIColor clearColor];
         messageLabel.alpha = 1.0;
         messageLabel.text = message;
 
