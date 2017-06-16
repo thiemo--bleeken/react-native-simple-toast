@@ -184,17 +184,6 @@ static const NSString * CSToastQueueKey             = @"CSToastQueueKey";
     }
     return [UIColor colorWithRed:((c & 0xff0000) >> 16)/255.0 green:((c & 0xff00) >> 8)/255.0 blue:(c & 0xff)/255.0 alpha:1.0];
 }
-- (NSTextAlignment *)convertStringToNsTextAlignment:(NSString *)textAlign {
-    NSTextAlignment alignment=NSTextAlignmentLeft;
-    if([textAlign isEqualToString:@"center"]){
-        return NSTextAlignmentCenter;
-    }else if ([textAlign isEqualToString:@"right"]){
-        alignment = NSTextAlignmentRight;
-    }else{
-        alignment = NSTextAlignmentLeft;
-    }
-    return alignment;
-}
 
 #pragma mark - View Construction
 
