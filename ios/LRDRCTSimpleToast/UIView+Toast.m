@@ -212,7 +212,7 @@ static const NSString * CSToastQueueKey             = @"CSToastQueueKey";
         wrapperView.layer.shadowOffset = style.shadowOffset;
     }
 
-    wrapperView.backgroundColor = style.backgroundColor;
+    wrapperView.backgroundColor = [UIColor clearColor];
 
     if(image != nil) {
         imageView = [[UIImageView alloc] initWithImage:image];
@@ -247,7 +247,7 @@ static const NSString * CSToastQueueKey             = @"CSToastQueueKey";
         expectedSizeTitle = CGSizeMake(MIN(maxSizeTitle.width, expectedSizeTitle.width), MIN(maxSizeTitle.height, expectedSizeTitle.height));
         titleLabel.frame = CGRectMake(0.0, 0.0, expectedSizeTitle.width, expectedSizeTitle.height);
     }
-    if (message != nil) {
+    if (message != nil && customStyle != nil) {
         messageLabel = [[UILabel alloc] init];
         messageLabel.numberOfLines = style.messageNumberOfLines;
         messageLabel.font = style.messageFont;
@@ -258,6 +258,23 @@ static const NSString * CSToastQueueKey             = @"CSToastQueueKey";
         messageLabel.layer.borderWidth=[customStyle[@"borderWidth"] floatValue];
         messageLabel.layer.cornerRadius=[customStyle[@"borderRadius"] floatValue];
         messageLabel.layer.backgroundColor = [self stringColorConvertoUIColor:customStyle[@"backgroundColor"]].CGColor;
+        messageLabel.backgroundColor = [UIColor clearColor];
+        messageLabel.alpha = 1.0;
+        messageLabel.text = message;
+
+        CGSize maxSizeMessage = CGSizeMake((self.bounds.size.width * style.maxWidthPercentage) - imageRect.size.width, self.bounds.size.height * style.maxHeightPercentage);
+        CGSize expectedSizeMessage = [messageLabel sizeThatFits:maxSizeMessage];
+        // UILabel can return a size larger than the max size when the number of lines is 1
+        expectedSizeMessage = CGSizeMake(MIN(maxSizeMessage.width, expectedSizeMessage.width), MIN(maxSizeMessage.height, expectedSizeMessage.height));
+        messageLabel.frame = CGRectMake(0.0, 0.0, expectedSizeMessage.width, expectedSizeMessage.height);
+    }
+    if(message != nil && customStyle == nil){
+        messageLabel = [[UILabel alloc] init];
+        messageLabel.numberOfLines = style.messageNumberOfLines;
+        messageLabel.font = style.messageFont;
+        messageLabel.textAlignment = style.messageAlignment;
+        messageLabel.lineBreakMode = NSLineBreakByTruncatingTail;
+        messageLabel.textColor = style.messageColor;
         messageLabel.backgroundColor = [UIColor clearColor];
         messageLabel.alpha = 1.0;
         messageLabel.text = message;
@@ -280,11 +297,18 @@ static const NSString * CSToastQueueKey             = @"CSToastQueueKey";
 
     CGRect messageRect = CGRectZero;
 
-    if(messageLabel != nil) {
+    if(messageLabel != nil && customStyle != nil) {
         messageRect.origin.x = imageRect.origin.x + imageRect.size.width + style.horizontalPadding;
         messageRect.origin.y = titleRect.origin.y + titleRect.size.height + style.verticalPadding;
         messageRect.size.width = [customStyle[@"width"] floatValue];
         messageRect.size.height = [customStyle[@"height"] floatValue];
+    }
+
+    if(messageLabel != nil && customStyle == nil){
+        messageRect.origin.x = imageRect.origin.x + imageRect.size.width + style.horizontalPadding;
+        messageRect.origin.y = titleRect.origin.y + titleRect.size.height + style.verticalPadding;
+        messageRect.size.width = messageLabel.bounds.size.width;
+        messageRect.size.height = messageLabel.bounds.size.height;
     }
 
     CGFloat longerWidth = MAX(titleRect.size.width, messageRect.size.width);
@@ -422,7 +446,7 @@ static const NSString * CSToastQueueKey             = @"CSToastQueueKey";
 - (instancetype)initWithDefaultStyle {
     self = [super init];
     if (self) {
-        self.backgroundColor = [UIColor clearColor];
+        self.backgroundColor = [[UIColor blackColor] colorWithAlphaComponent:0.8];
         self.titleColor = [UIColor whiteColor];
         self.messageColor = [UIColor whiteColor];
         self.maxWidthPercentage = 0.8;
@@ -442,7 +466,7 @@ static const NSString * CSToastQueueKey             = @"CSToastQueueKey";
         self.shadowOffset = CGSizeMake(4.0, 4.0);
         self.imageSize = CGSizeMake(80.0, 80.0);
         self.activitySize = CGSizeMake(100.0, 100.0);
-        self.fadeDuration = 0.01;
+        self.fadeDuration = 0.2;
     }
     return self;
 }
