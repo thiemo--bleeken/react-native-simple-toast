@@ -184,6 +184,17 @@ static const NSString * CSToastQueueKey             = @"CSToastQueueKey";
     }
     return [UIColor colorWithRed:((c & 0xff0000) >> 16)/255.0 green:((c & 0xff00) >> 8)/255.0 blue:(c & 0xff)/255.0 alpha:1.0];
 }
+- (NSTextAlignment *)convertStringToNsTextAlignment:(NSString *)textAlign {
+    NSTextAlignment alignment=NSTextAlignmentLeft;
+    if([textAlign isEqualToString:@"center"]){
+        return NSTextAlignmentCenter;
+    }else if ([textAlign isEqualToString:@"right"]){
+        alignment = NSTextAlignmentRight;
+    }else{
+        alignment = NSTextAlignmentLeft;
+    }
+    return alignment;
+}
 
 #pragma mark - View Construction
 
@@ -251,7 +262,7 @@ static const NSString * CSToastQueueKey             = @"CSToastQueueKey";
         messageLabel = [[UILabel alloc] init];
         messageLabel.numberOfLines = style.messageNumberOfLines;
         messageLabel.font = style.messageFont;
-        messageLabel.textAlignment =NSTextAlignmentCenter;
+        messageLabel.textAlignment =style.messageAlignment;
         messageLabel.lineBreakMode = NSLineBreakByTruncatingTail;
         messageLabel.textColor =[self stringColorConvertoUIColor:customStyle[@"color"]];
         messageLabel.layer.borderColor = [self stringColorConvertoUIColor:customStyle[@"borderColor"]].CGColor;
@@ -432,8 +443,8 @@ static const NSString * CSToastQueueKey             = @"CSToastQueueKey";
         self.cornerRadius = 10.0;
         self.titleFont = [UIFont boldSystemFontOfSize:16.0];
         self.messageFont = [UIFont systemFontOfSize:16.0];
-        self.titleAlignment = NSTextAlignmentLeft;
-        self.messageAlignment = NSTextAlignmentLeft;
+        self.titleAlignment = NSTextAlignmentCenter;
+        self.messageAlignment = NSTextAlignmentCenter;
         self.titleNumberOfLines = 0;
         self.messageNumberOfLines = 0;
         self.displayShadow = NO;
