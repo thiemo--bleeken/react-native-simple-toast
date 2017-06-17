@@ -200,7 +200,13 @@ static const NSString * CSToastQueueKey             = @"CSToastQueueKey";
     UILabel *messageLabel = nil;
     UILabel *titleLabel = nil;
     UIImageView *imageView = nil;
-
+    UIColor *textColor;
+    struct CGColor *borderColor=nil;
+    struct CGColor *backgroundColor=nil;
+    float borderWidth=1.0;
+    float borderRadius=1.0;
+    float width=0.0;
+    float height=0.0;
     UIView *wrapperView = [[UIView alloc] init];
     wrapperView.autoresizingMask = (UIViewAutoresizingFlexibleLeftMargin | UIViewAutoresizingFlexibleRightMargin | UIViewAutoresizingFlexibleTopMargin | UIViewAutoresizingFlexibleBottomMargin);
     wrapperView.layer.cornerRadius = style.cornerRadius;
@@ -247,34 +253,58 @@ static const NSString * CSToastQueueKey             = @"CSToastQueueKey";
         expectedSizeTitle = CGSizeMake(MIN(maxSizeTitle.width, expectedSizeTitle.width), MIN(maxSizeTitle.height, expectedSizeTitle.height));
         titleLabel.frame = CGRectMake(0.0, 0.0, expectedSizeTitle.width, expectedSizeTitle.height);
     }
-    if (message != nil && customStyle != nil) {
-        messageLabel = [[UILabel alloc] init];
+    if(customStyle && customStyle[@"color"]){
+        textColor=[self stringColorConvertoUIColor:customStyle[@"color"]];
+    }
+    if(customStyle && !customStyle[@"color"]){
+        textColor=style.messageColor;
+    }
+    if(customStyle && customStyle[@"borderColor"]){
+        borderColor=[self stringColorConvertoUIColor:customStyle[@"borderColor"]].CGColor;
+    }
+    if(customStyle && !customStyle[@"borderColor"]){
+        borderColor=[UIColor clearColor].CGColor;
+    }
+    if(customStyle && customStyle[@"borderWidth"]){
+        borderWidth=(float)[customStyle[@"borderWidth"] floatValue];
+    }
+    if(customStyle && !customStyle[@"borderWidth"]){
+        borderWidth=0;
+    }
+    if(customStyle && customStyle[@"borderRadius"]){
+        borderRadius=(float)[customStyle[@"borderRadius"] floatValue];
+    }
+    if(customStyle && !customStyle[@"borderRadius"]){
+        borderRadius=0;
+    }
+    if(customStyle && customStyle[@"backgroundColor"]){
+        backgroundColor=[self stringColorConvertoUIColor:customStyle[@"backgroundColor"]].CGColor;
+    }
+    if(customStyle && !customStyle[@"backgroundColor"]){
+        backgroundColor=style.backgroundColor.CGColor;
+    }
+    if(customStyle && customStyle[@"width"]){
+        width=[customStyle[@"width"] floatValue];
+    }
+
+    if(!customStyle){
+        textColor=style.messageColor;
+        borderColor=[UIColor clearColor].CGColor;
+        borderWidth=0;
+        borderRadius=0;
+        backgroundColor=style.backgroundColor.CGColor;
+    }
+    if (message != nil) {
+        messageLabel=[[UILabel alloc] init];
         messageLabel.numberOfLines = style.messageNumberOfLines;
         messageLabel.font = style.messageFont;
         messageLabel.textAlignment =style.messageAlignment;
         messageLabel.lineBreakMode = NSLineBreakByTruncatingTail;
-        messageLabel.textColor =[self stringColorConvertoUIColor:customStyle[@"color"]];
-        messageLabel.layer.borderColor = [self stringColorConvertoUIColor:customStyle[@"borderColor"]].CGColor;
-        messageLabel.layer.borderWidth=[customStyle[@"borderWidth"] floatValue];
-        messageLabel.layer.cornerRadius=[customStyle[@"borderRadius"] floatValue];
-        messageLabel.layer.backgroundColor = [self stringColorConvertoUIColor:customStyle[@"backgroundColor"]].CGColor;
-        messageLabel.backgroundColor = [UIColor clearColor];
-        messageLabel.alpha = 1.0;
-        messageLabel.text = message;
-
-        CGSize maxSizeMessage = CGSizeMake((self.bounds.size.width * style.maxWidthPercentage) - imageRect.size.width, self.bounds.size.height * style.maxHeightPercentage);
-        CGSize expectedSizeMessage = [messageLabel sizeThatFits:maxSizeMessage];
-        // UILabel can return a size larger than the max size when the number of lines is 1
-        expectedSizeMessage = CGSizeMake(MIN(maxSizeMessage.width, expectedSizeMessage.width), MIN(maxSizeMessage.height, expectedSizeMessage.height));
-        messageLabel.frame = CGRectMake(0.0, 0.0, expectedSizeMessage.width, expectedSizeMessage.height);
-    }
-    if(message != nil && customStyle == nil){
-        messageLabel = [[UILabel alloc] init];
-        messageLabel.numberOfLines = style.messageNumberOfLines;
-        messageLabel.font = style.messageFont;
-        messageLabel.textAlignment = style.messageAlignment;
-        messageLabel.lineBreakMode = NSLineBreakByTruncatingTail;
-        messageLabel.textColor = style.messageColor;
+        messageLabel.textColor =textColor;
+        messageLabel.layer.borderColor = borderColor;
+        messageLabel.layer.borderWidth=borderWidth;
+        messageLabel.layer.cornerRadius=borderRadius;
+        messageLabel.layer.backgroundColor = backgroundColor;
         messageLabel.backgroundColor = [UIColor clearColor];
         messageLabel.alpha = 1.0;
         messageLabel.text = message;
@@ -288,6 +318,16 @@ static const NSString * CSToastQueueKey             = @"CSToastQueueKey";
 
     CGRect titleRect = CGRectZero;
 
+    if(customStyle && !customStyle[@"width"]){
+        width=messageLabel.bounds.size.width;
+    }
+    if(customStyle && customStyle[@"height"]){
+        height=[customStyle[@"height"] floatValue];
+    }
+    if(customStyle && !customStyle[@"height"]){
+        height=messageLabel.bounds.size.height;
+    }
+
     if(titleLabel != nil) {
         titleRect.origin.x = imageRect.origin.x + imageRect.size.width + style.horizontalPadding;
         titleRect.origin.y = style.verticalPadding;
@@ -297,18 +337,11 @@ static const NSString * CSToastQueueKey             = @"CSToastQueueKey";
 
     CGRect messageRect = CGRectZero;
 
-    if(messageLabel != nil && customStyle != nil) {
+    if(messageLabel != nil) {
         messageRect.origin.x = imageRect.origin.x + imageRect.size.width + style.horizontalPadding;
         messageRect.origin.y = titleRect.origin.y + titleRect.size.height + style.verticalPadding;
-        messageRect.size.width = [customStyle[@"width"] floatValue];
-        messageRect.size.height = [customStyle[@"height"] floatValue];
-    }
-
-    if(messageLabel != nil && customStyle == nil){
-        messageRect.origin.x = imageRect.origin.x + imageRect.size.width + style.horizontalPadding;
-        messageRect.origin.y = titleRect.origin.y + titleRect.size.height + style.verticalPadding;
-        messageRect.size.width = messageLabel.bounds.size.width;
-        messageRect.size.height = messageLabel.bounds.size.height;
+        messageRect.size.width = width;
+        messageRect.size.height = height;
     }
 
     CGFloat longerWidth = MAX(titleRect.size.width, messageRect.size.width);
