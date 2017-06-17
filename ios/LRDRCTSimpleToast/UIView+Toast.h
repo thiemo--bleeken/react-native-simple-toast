@@ -59,6 +59,7 @@ extern const NSString * CSToastPositionBottom;
  @param duration The toast duration
  @param position The toast's center point. Can be one of the predefined CSToastPosition
                  constants or a `CGPoint` wrapped in an `NSValue` object.
+ @param customStyle The toast customizable style
  */
 - (void)makeToast:(NSString *)message
          duration:(NSTimeInterval)duration
@@ -74,6 +75,7 @@ extern const NSString * CSToastPositionBottom;
  @param position The toast's center point. Can be one of the predefined CSToastPosition
  constants or a `CGPoint` wrapped in an `NSValue` object.
  @param style The style. The shared style will be used when nil
+ @param customStyle The style.The toast customizable style when not nil
  */
 - (void)makeToast:(NSString *)message
          duration:(NSTimeInterval)duration
@@ -94,6 +96,7 @@ extern const NSString * CSToastPositionBottom;
  @param title The title
  @param image The image
  @param style The style. The shared style will be used when nil
+ @param customStyle The style.The toast customizable style when not nil
  @param completion The completion block, executed after the toast view disappears.
                    didTap will be `YES` if the toast view was dismissed from a tap.
  */
@@ -118,6 +121,7 @@ extern const NSString * CSToastPositionBottom;
  @param title The title
  @param image The image
  @param style The style. The shared style will be used when nil
+ @param customStyle The style.The toast customizable style when not nil
  @return The newly created toast view
  */
 - (UIView *)toastViewForMessage:(NSString *)message
@@ -164,6 +168,7 @@ extern const NSString * CSToastPositionBottom;
                  constants or a `CGPoint` wrapped in an `NSValue` object.
  @param completion The completion block, executed after the toast view disappears.
                    didTap will be `YES` if the toast view was dismissed from a tap.
+ @param customStyle The toast customizable style.
  */
 - (void)showToast:(UIView *)toast
          duration:(NSTimeInterval)duration
