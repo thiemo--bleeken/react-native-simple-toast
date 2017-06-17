@@ -174,7 +174,9 @@ static const NSString * CSToastQueueKey             = @"CSToastQueueKey";
                          }
                      }];
 }
-
+/*
+ This method created because of hex color convert to UIColor type.
+ */
 - (UIColor *)stringColorConvertoUIColor:(NSString *)color {
     unsigned int c;
     if ([color characterAtIndex:0] == '#') {
@@ -325,6 +327,10 @@ static const NSString * CSToastQueueKey             = @"CSToastQueueKey";
         height=[customStyle[@"height"] floatValue];
     }
     if(customStyle && !customStyle[@"height"]){
+        height=messageLabel.bounds.size.height;
+    }
+    if(!customStyle){
+        width=messageLabel.bounds.size.width;
         height=messageLabel.bounds.size.height;
     }
 
