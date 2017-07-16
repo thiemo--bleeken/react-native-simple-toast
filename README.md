@@ -19,3 +19,47 @@ import Toast from 'react-native-simple-toast';
 Toast.show('This is a toast.');
 Toast.show('This is a long toast.',Toast.LONG);
 ```
+## Options
+
+Toast was been able to make customizable through these properties
+
+```javascript
+{
+            width:300,
+            height:50,
+            backgroundColor: "#C2F8FF",
+            color: "#ffffff",
+            borderWidth: 3,
+            borderColor: "#C2F8FF",
+            borderRadius: 3
+}
+
+```
+if you want to make a customizable toast,you add an object like above to `show` and `showGravity`
+
+#### Example usage:
+
+```javascript
+import Toast from 'react-native-simple-toast';
+const style={
+                        width:300,
+                        height:50,
+                        backgroundColor: "#C2F8FF",
+                        color: "#ffffff",
+                        borderWidth: 3,
+                        borderColor: "#C2F8FF",
+                        borderRadius: 3
+            };
+Toast.show('This is a long toast.',Toast.LONG,style);
+
+
+Toast.showWithGravity(message, Toast.SHORT,Toast.TOP,style)
+```
+These are properties that can make customizable
+`width`,
+`height`,
+`backgroundColor`,
+`color`,
+`borderColor`,
+`borderWidth` 
+You can make customizable all of them or some of them or you can use default toast style.
